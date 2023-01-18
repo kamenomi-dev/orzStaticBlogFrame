@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+    "composite": true,
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "allowJs": true,
+    "sourceMap": true,
+    "rootDir": "./src",
+    // "outFile": "./dist/",
+    "outDir": "./dist",
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true
+  },
+  "compileOnSave": true,
+  "include": [
+    "src"
+  ]
+}
