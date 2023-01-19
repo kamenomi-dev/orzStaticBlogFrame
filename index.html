@@ -5,10 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title class="orz" conf="websiteTitle">OrzBlog</title>
+    <link rel="stylesheet" href="/dist/css/orzFrame.css">
+    <link rel="stylesheet" href="/dist/css/theme.css">
     <script src="//cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="//cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="/dist/main.js"></script>
   </head>
-  <body>
-    
+  <body id="orzFrame">
+    <div class="onTop" id="orzTopbar"></div>
+    <div class="onTop" id="orzContentRect">
+      <div id="orzArticleContent"></div>
+      <div id="orzActivityRect">
+        <div id="orzActivitybar"></div>
+        <div id="orzTabinfo"></div>
+      </div>
+    </div>
+    <div class="onTop" id="orzStatusbar"></div>
   </body>
 </html>
