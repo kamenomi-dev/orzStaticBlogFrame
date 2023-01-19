@@ -1,0 +1,76 @@
+/*  DOM  */
+body {
+  margin: 0;
+  //min-height: 100vh;
+  height: 200%;
+  overflow: hidden;
+}
+
+;
+
+/* class */
+.onTop {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+}
+
+;
+
+#orzTopbar {
+  top: 0px;
+  height: 30px;
+  background-color: var(--orzframe-background-onFocus-topbar);
+}
+
+;
+
+#orzContentRect {
+  top: 30px;
+  left: 0px;
+  right: 0px;
+  bottom: 22px;
+
+  >#orzActivityRect {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50%;
+    bottom: 0px;
+
+    >#orzActivitybar {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 48px;
+      bottom: 0px;
+      background-color: var(--orzframe-background-normal-activitybar);
+    };
+
+    >#orzTabinfo {
+      position: absolute;
+      top: 0px;
+      left: 48px;
+      right: 0px;
+      bottom: 0px;
+      background-color: var(--orzframe-background-normal-tabinfo);
+    };
+  };
+
+  >#orzArticleContent {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+
+    padding-top: 22px;
+    padding-bottom: 30px;
+  };
+}
+
+;
+
+#orzStatusbar {
+  bottom: 0px;
+  height: 22px;
+  background-color: var(--orzframe-background-onFree-statusbar);
+};
