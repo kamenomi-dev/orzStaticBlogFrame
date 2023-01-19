@@ -10,7 +10,7 @@
 
 依赖:
 
-1. typescript
+1. typescript (ESNext)
 2. JQuery
 3. JQuery-cookie
 4. Showdown
