@@ -1,7 +1,6 @@
+/// <reference path="./orzProcessor.ts" />
 {
-  var orzProcessor = new orzBlogFrame.orzProcessor();
   $(() => {
-    
-    
+    var orzProcessor = new orzBlogFrame.orzProcessor();
   });
 };
