@@ -10,10 +10,11 @@
 
 依赖:
 
-1. typescript (ESNext)
-2. JQuery
-3. JQuery-cookie
-4. Showdown
+1. [TypeScript (ESNext)](https://github.com/microsoft/TypeScript)
+2. [jQuery](https://github.com/jquery/jquery)
+3. [jQuery-cookie](https://github.com/carhartl/jquery-cookie)
+4. [jQuery-hoverIntent](https://github.com/briancherne/jquery-hoverIntent)
+4. [ShowDown](https://github.com/showdownjs/showdown)
 
 扩展:
 
