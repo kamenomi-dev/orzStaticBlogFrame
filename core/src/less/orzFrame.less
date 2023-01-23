@@ -1,0 +1,175 @@
+/*  DOM  */
+body {
+  margin: 0;
+  //min-height: 100vh;
+  height: 200%;
+  overflow: hidden;
+}
+
+;
+
+* {
+  user-select: none;
+  -o-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+
+;
+
+/* event */
+.orzScrollbar {
+  cursor: col-resize;
+
+  position: absolute;
+  top: 0px;
+  width: 5px;
+  bottom: 0px;
+
+  content: '';
+  transition: background-color .1s ease-out;
+  background-color: transparent;
+
+  &.scrollbar-hover {
+    background-color: var(--orzframe-background-onFocus-contentScrollbar);
+  }
+
+  ;
+}
+
+;
+
+/* class */
+.onTop {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+}
+
+;
+
+#orzTopbarRect {
+  top: 0px;
+  height: 30px;
+  background-color: var(--orzframe-background-onFocus-topbar);
+
+  .orzTopbar {
+    top: inherit;
+    height: inherit;
+
+    &#orzTopbarIcon {
+      display: block;
+      position: relative;
+      width: 48px;
+      height: 100%;
+      z-index: 2500;
+
+      background-image: url('/assets/favicon/favicon-16x16.png');
+      background-size: 16px;
+      background-repeat: no-repeat;
+      background-position: 50%;
+    }
+
+    ;
+
+    &#orzTopbarMenu {
+      display: flex;
+      flex-direction: row;
+      position: absolute;
+      top: 0px;
+      left: 48px;
+      min-width: 36px;
+
+      >.orzMenuItem {
+
+        align-items: center;
+        display: flex;
+        height: 30px;
+        box-sizing: border-box;
+        white-space: nowrap;
+
+        flex-wrap: nowrap;
+
+        :first-child {
+          display: inline-block;
+          padding: 0 8px;
+          font-size: 13px;
+          line-height: 30px;
+          border-radius: 5px;
+          vertical-align: middle;
+        }
+
+        ;
+      }
+
+      ;
+    }
+
+    ;
+  }
+
+  ;
+}
+
+;
+
+#orzContentRect {
+  top: 30px;
+  left: 0px;
+  right: 0px;
+  bottom: 22px;
+
+  >#orzActivityRect {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 50%;
+    bottom: 0px;
+
+    >#orzActivitybar {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 48px;
+      bottom: 0px;
+      background-color: var(--orzframe-background-normal-activitybar);
+    }
+
+    ;
+
+    >#orzTabinfo {
+      position: absolute;
+      top: 0px;
+      left: 48px;
+      right: 0px;
+      bottom: 0px;
+      background-color: var(--orzframe-background-normal-tabinfo);
+    }
+
+    ;
+  }
+
+  ;
+
+  >#orzArticleContent {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+
+    min-height: 100vh;
+    padding-top: -30px;
+    padding-bottom: -22px;
+  }
+
+  ;
+}
+
+;
+
+#orzStatusbarRect {
+  bottom: 0px;
+  height: 22px;
+  background-color: var(--orzframe-background-onFree-statusbar);
+}
+
+;
