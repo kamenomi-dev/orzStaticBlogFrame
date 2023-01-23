@@ -4,22 +4,44 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title class="orz" conf="websiteTitle">OrzBlog</title>
-    <link rel="stylesheet" href="/dist/css/orzFrame.css">
-    <link rel="stylesheet" href="/dist/css/theme.css">
+    <title class="orzLanguage" by="title" from="$1">OrzBlog</title>
+    <link rel="apple-touch-icon" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" size="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" size="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="./assets/favicon/site.webmanifest">
+    <link rel="stylesheet" href="/core/dist/css/orzFrame.css">
+    <link rel="stylesheet" href="/themes/light/theme.css" id="orzTheme">
     <script src="//cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="//cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    <script src="/dist/main.js"></script>
+    <script src="//cdn.bootcdn.net/ajax/libs/jquery.hoverintent/1.10.2/jquery.hoverIntent.min.js"></script>
+    <script src="/core/dist/main.js"></script>
   </head>
   <body id="orzFrame">
-    <div class="onTop" id="orzTopbar"></div>
+    <div class="onTop" id="orzTopbarRect">
+      <a class="orzTopbar" id="orzTopbarIcon" href="/"></a>
+      <div class="orzTopbar" id="orzTopbarMenu">
+        <div class="orzMenuItem">
+          <div class="orzItemTitle orzLanguage" by="home">aaaa</div>
+        </div>
+        <div class="orzMenuItem">
+          <div class="orzItemTitle orzLanguage" by="archive">a</div>
+        </div>
+        <div class="orzMenuItem">
+          <div class="orzItemTitle orzLanguage" by="tags"></div>
+        </div>
+        <div class="orzMenuItem">
+          <div class="orzItemTitle orzLanguage" by="links"></div>
+        </div>
+      </div>
+    </div>
     <div class="onTop" id="orzContentRect">
       <div id="orzArticleContent"></div>
       <div id="orzActivityRect">
         <div id="orzActivitybar"></div>
         <div id="orzTabinfo"></div>
       </div>
+      <div class="orzScrollbar" id="orzContentScroll"></div>
     </div>
-    <div class="onTop" id="orzStatusbar"></div>
+    <div class="onTop" id="orzStatusbarRect"></div>
   </body>
 </html>

@@ -6,8 +6,8 @@
     "target": "ESNext",
     "allowJs": true,
     "sourceMap": true,
-    "rootDir": "./src",
-    "outFile": "./dist/main.js",
+    "rootDir": "./core/src",
+    "outFile": "core/dist/main.js",
     // "outDir": "./dist",
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
@@ -17,6 +17,7 @@
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "core/src",
+    "../node_modules/@types/jquery-hoverintent/index.d.ts"
   ]
 }
