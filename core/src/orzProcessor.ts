@@ -15,7 +15,7 @@ namespace orzBlogFrame {
       logger.log('DEBUG', 'orzBlogFrame.<main>@orzProcseeor Init!');
       logger.log('DEBUG', 'OK! Waitting for user set the config.');
       logger.log('DEBUG', 'Languages:', await langs.getSupoortLang());
-      langs.set();
+      langs.set(true);
     };
 
     public async init(config: {
@@ -23,6 +23,8 @@ namespace orzBlogFrame {
       defaultTheme?: string
     }) {
       const frame = $('#orzFrame');
+      const topbar = $('#orzTopbarRect', frame);
+      const topbarMenu = $('#orzTopbarMenu', topbar);
       const contentRect = $('#orzContentRect', frame);
       const activityRect = $('#orzActivityRect', contentRect);
       const contentScroll = $('#orzContentScroll', contentRect);
@@ -37,22 +39,21 @@ namespace orzBlogFrame {
       })();
 
       // config parse
-      (function parseConfig() {
+      await (async function parseConfig() {
         const linkTheme = $('link[id="orzTheme"]');
-        const linkThemeLast = linkTheme.attr('href') as string;
 
         if (config.defaultTheme) {
-          // exist
-          if (!file.isExistFile(`/themes/${config.defaultTheme}/theme.css`)) {
-            logger.log('ERROR', 'defaultTheme isn\'t exist!\n', '   at orzBlogFrame.<main>@<async>@@init?parseConfig');
-          } else {
+          if (!await file.get(`/themes/${config.defaultTheme}/theme.css`))
+            logger.log('ERROR', '[orzProcessor@parseConfig] defaultTheme isn\'t exist!\n');
+          else {
             // use default
             $.cookie('orzCurrentTheme', config.defaultTheme);
             linkTheme.attr('href', `/themes/${config.defaultTheme}/theme.css`);
           };
         } else {
           // use last theme from cookie
-          linkTheme.attr('href', `/themes/${$.cookie('orzCurrentTheme')}/theme.css`);
+          if ($.cookie('orzCurrentTheme') != 'light')
+            linkTheme.attr('href', `/themes/${$.cookie('orzCurrentTheme')}/theme.css`);
         };
       })();
 
@@ -82,18 +83,32 @@ namespace orzBlogFrame {
             $.cookie('orzContentScrollLeft', ev.clientX! - 2);
             body.off('mouseup.contentScrollbar');
             body.off('mousemove.contentScrollbar');
-            logger.log('DEBUG', 'ContentScrollbar end.');
           });
-          logger.log('DEBUG', 'ContentScrollbar begin.');
         });
 
         // scroll bar hightlight.
-        contentScroll.hoverIntent(() => {
-          contentScroll.addClass('scrollbar-hover');
-        }, () => {
-          // delay doesn't work!!!
-          // contentScroll.delay(1250).removeClass('scrollbar-hover');
-          contentScroll.removeClass('scrollbar-hover');
+        contentScroll.hoverIntent(
+          () => {
+            contentScroll.addClass('scrollbar-hover');
+          },() => {
+            // delay doesn't work!!!
+            // contentScroll.delay(1250).removeClass('scrollbar-hover');
+            contentScroll.removeClass('scrollbar-hover');
+          }
+        );
+      })();
+
+      // global document
+      (function globalDocument () {
+        frame.on('focus', () => {
+          console.log('eee');
+          
+          topbar.removeClass('onTopbarBlur');
+          topbarMenu.removeClass('onTopbarBlur');
+        });
+        frame.on('blur', () => {
+          topbar.addClass('onTopbarBlur');
+          topbarMenu.addClass('onTopbarBlur');
         });
       })();
     };

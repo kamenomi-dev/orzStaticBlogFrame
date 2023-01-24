@@ -8,19 +8,15 @@ var orzBlogFrame;
                 return;
             }
             ;
-            /**
-             * isExistFile
-             */
-            isExistFile(UrlPath) {
-                let isExist = false;
-                $.ajax({
-                    url: UrlPath,
-                    async: false,
-                    success: () => {
-                        isExist = true;
-                    }
-                });
-                return isExist;
+            async get(urlPath) {
+                var result = { data: '', isExist: false };
+                await fetch(urlPath)
+                    .then(response => {
+                    result.isExist = response.ok;
+                    return response.text();
+                })
+                    .then(text => result.data = text);
+                return result;
             }
         }
         Utils.File = File;
@@ -59,7 +55,6 @@ var orzBlogFrame;
             }
             format(status, ...log) {
                 var fullLog = '', format = '';
-                // To string.
                 log.forEach((value, index) => {
                     switch (typeof value) {
                         case 'bigint':
@@ -85,11 +80,8 @@ var orzBlogFrame;
                             break;
                     }
                 });
-                // Format time
                 {
-                    let currentDate = new Date(), 
-                    /* - - - - - - - - - - - - - - - - - */
-                    year = currentDate.getFullYear().toString(), month = (currentDate.getMonth() + 1).toString(), day = currentDate.getDay().toString(), hour = currentDate.getHours().toString(), minute = currentDate.getMinutes().toString(), second = currentDate.getSeconds().toString();
+                    let currentDate = new Date(), year = currentDate.getFullYear().toString(), month = (currentDate.getMonth() + 1).toString(), day = currentDate.getDay().toString(), hour = currentDate.getHours().toString(), minute = currentDate.getMinutes().toString(), second = currentDate.getSeconds().toString();
                     format = this.logFormat
                         .replace(/\{y+\}/g, year)
                         .replace(/\{m+\}/g, month.length == 1 ? `0${month}` : month)
@@ -99,7 +91,6 @@ var orzBlogFrame;
                         .replace(/\{S+\}/g, second.length == 1 ? `0${second}` : second);
                 }
                 ;
-                // Format all
                 {
                     format = format
                         .replace('{status}', status)
@@ -142,13 +133,12 @@ var orzBlogFrame;
     })(Utils = orzBlogFrame.Utils || (orzBlogFrame.Utils = {}));
 })(orzBlogFrame || (orzBlogFrame = {}));
 ;
-/// <reference path="./Log4ts.ts" />
 var orzBlogFrame;
 (function (orzBlogFrame) {
     var Utils;
     (function (Utils) {
         class LanguageEx {
-            nodesEle = $('.orzLanguage');
+            nodes = $('.orzLanguage');
             languageIndex = [];
             langJson;
             subLangJson;
@@ -157,27 +147,15 @@ var orzBlogFrame;
                 orzBlogFrame.logger.log('DEBUG', 'orzBlogFrame.Utils@LanguageEx Init!');
             }
             ;
-            async getSupoortLang(isHotReload = false) {
-                if (this.languageIndex.length == 0 || isHotReload)
-                    $.ajax({
-                        url: '/language/langIndex.json',
-                        async: false,
-                        dataType: 'JSON',
-                        success: (response) => {
-                            for (let locale in response) {
-                                this.languageIndex.push(locale);
-                            }
-                            ;
-                        },
-                        error: () => {
-                            orzBlogFrame.logger.log('ERROR', 'LangIndex is gone!');
-                        }
-                    });
+            async getSupoortLang(reload = false) {
+                if (this.languageIndex.length == 0 || reload)
+                    await fetch('/language/langIndex.json')
+                        .then(langFile => langFile.json())
+                        .then(lang => this.languageIndex = lang);
                 return this.languageIndex;
             }
             ;
-            async set(locale = 'zh-CN', subLocale = 'en-US') {
-                /* isExist */
+            async set(reload = false, locale = 'zh-CN', subLocale = 'en-US') {
                 if (this.languageIndex.indexOf(locale) == -1) {
                     orzBlogFrame.logger.log('WARN', `${locale} is not supported!`);
                     return false;
@@ -188,52 +166,49 @@ var orzBlogFrame;
                     return false;
                 }
                 ;
-                /* Get *.lang.json */
-                if (!this.langJson || this.langJson['language'] != locale)
-                    this.langJson = await this.getLangJson(locale);
-                if (!this.subLangJson || this.subLangJson['language'] != subLocale)
-                    this.subLangJson = await this.getLangJson(subLocale);
-                // console.log( this.langJson, this.subLangJson);
-                /* Set element */
-                this.nodesEle = $('.orzLanguage');
+                if (locale == subLocale) {
+                    this.subLangJson
+                        = this.langJson['language'] == locale
+                            ? this.langJson
+                            : (this.langJson = await this.getLangJson(locale));
+                }
+                else {
+                    if (reload || this.langJson['language'] != locale)
+                        this.langJson = await this.getLangJson(locale);
+                    if (reload || this.subLangJson['language'] != subLocale)
+                        this.subLangJson = await this.getLangJson(subLocale);
+                }
+                ;
                 $('html').attr('lang', locale);
+                this.nodes = $('.orzLanguage');
                 this.refresh();
                 orzBlogFrame.logger.log('DEBUG', 'Succeefully change language.');
                 return true;
             }
             ;
             async refresh(id) {
-                const lang = this.langJson['language'];
-                this.nodesEle.each((index, node) => {
-                    let node_ = $(node);
-                    let value;
-                    if (node_.attr('by') == id && id)
-                        value = id;
-                    else
-                        value = node_.attr('by');
-                    let attrFrom = node_.attr('from');
-                    if ((value in this.langJson[lang]) || (value in this.subLangJson[lang]))
+                var lang = this.langJson['language'];
+                this.nodes.each((index, node) => {
+                    var node_ = $(node);
+                    var value = (node_.attr('by') == id && id)
+                        ? id : node_.attr('by');
+                    var attrFrom = node_.attr('from');
+                    var text = (this.langJson[lang][value] || this.subLangJson[lang][value]).toString();
+                    if (value in (this.langJson[lang] || value in this.subLangJson[lang]))
                         node_.text(attrFrom
-                            ? attrFrom.replace('$1', (this.langJson[lang][value] || this.subLangJson[lang][value]).toString())
-                            : (this.langJson[lang][value] || this.subLangJson[lang][value]).toString());
+                            ? attrFrom.replace('$1', text)
+                            : text);
                     else
                         orzBlogFrame.logger.log('WARN', `${value} isn't in ${lang} langFile. huh?`);
                 });
             }
             ;
             async getLangJson(arg) {
-                let result;
-                $.ajax({
-                    url: `/language/${arg}.lang.json`,
-                    async: false,
-                    dataType: 'JSON',
-                    success: response => {
-                        result = response;
-                    },
-                    error: () => {
-                        orzBlogFrame.logger.log('ERROR', 'LangIndex is not consistent!');
-                    }
-                });
+                var result;
+                await fetch(`/language/${arg}.lang.json`)
+                    .then(response => response.json())
+                    .then(json => result = json)
+                    .catch((er) => orzBlogFrame.logger.log('ERROR', `LangIndex isn't consistent! here: ${arg} - ${er.message}`));
                 return result;
             }
             ;
@@ -243,9 +218,6 @@ var orzBlogFrame;
     })(Utils = orzBlogFrame.Utils || (orzBlogFrame.Utils = {}));
 })(orzBlogFrame || (orzBlogFrame = {}));
 ;
-/// <reference path="./Utils/File.ts"/>
-/// <reference path="./Utils/Log4ts.ts" />
-/// <reference path="./Utils/LanguageEx.ts" />
 const License = 'MIT License';
 var orzBlogFrame;
 (function (orzBlogFrame) {
@@ -261,52 +233,45 @@ var orzBlogFrame;
             orzBlogFrame.logger.log('DEBUG', 'orzBlogFrame.<main>@orzProcseeor Init!');
             orzBlogFrame.logger.log('DEBUG', 'OK! Waitting for user set the config.');
             orzBlogFrame.logger.log('DEBUG', 'Languages:', await orzBlogFrame.langs.getSupoortLang());
-            orzBlogFrame.langs.set();
+            orzBlogFrame.langs.set(true);
         }
         ;
         async init(config) {
             const frame = $('#orzFrame');
+            const topbar = $('#orzTopbarRect', frame);
+            const topbarMenu = $('#orzTopbarMenu', topbar);
             const contentRect = $('#orzContentRect', frame);
             const activityRect = $('#orzActivityRect', contentRect);
             const contentScroll = $('#orzContentScroll', contentRect);
             const articleContent = $('#orzArticleContent', contentRect);
-            // init something
             (function initCookie() {
                 if ($.cookie('orzContentScrollLeft') == undefined)
                     $.cookie('orzContentScrollLeft', 170);
                 if ($.cookie('orzCurrentTheme') == undefined)
                     $.cookie('orzCurrentTheme', 'light');
             })();
-            // config parse
-            (function parseConfig() {
+            await (async function parseConfig() {
                 const linkTheme = $('link[id="orzTheme"]');
-                const linkThemeLast = linkTheme.attr('href');
                 if (config.defaultTheme) {
-                    // exist
-                    if (!orzBlogFrame.file.isExistFile(`/themes/${config.defaultTheme}/theme.css`)) {
-                        orzBlogFrame.logger.log('ERROR', 'defaultTheme isn\'t exist!\n', '   at orzBlogFrame.<main>@<async>@@init?parseConfig');
-                    }
+                    if (!await orzBlogFrame.file.get(`/themes/${config.defaultTheme}/theme.css`))
+                        orzBlogFrame.logger.log('ERROR', '[orzProcessor@parseConfig] defaultTheme isn\'t exist!\n');
                     else {
-                        // use default
                         $.cookie('orzCurrentTheme', config.defaultTheme);
                         linkTheme.attr('href', `/themes/${config.defaultTheme}/theme.css`);
                     }
                     ;
                 }
                 else {
-                    // use last theme from cookie
-                    linkTheme.attr('href', `/themes/${$.cookie('orzCurrentTheme')}/theme.css`);
+                    if ($.cookie('orzCurrentTheme') != 'light')
+                        linkTheme.attr('href', `/themes/${$.cookie('orzCurrentTheme')}/theme.css`);
                 }
                 ;
             })();
-            // content scroll
             (function contentScrollbar() {
-                // set default.
                 const cookieScrollLeft = $.cookie('orzContentScrollLeft');
                 activityRect.width(Number(cookieScrollLeft) + 2 + 'px');
                 contentScroll.css('left', `${cookieScrollLeft}px`);
                 articleContent.css('left', `${cookieScrollLeft}px`);
-                // move.
                 contentScroll.on('mousedown', ev => {
                     const body = $('body');
                     body.on('mousemove.contentScrollbar', function (ev) {
@@ -323,17 +288,23 @@ var orzBlogFrame;
                         $.cookie('orzContentScrollLeft', ev.clientX - 2);
                         body.off('mouseup.contentScrollbar');
                         body.off('mousemove.contentScrollbar');
-                        orzBlogFrame.logger.log('DEBUG', 'ContentScrollbar end.');
                     });
-                    orzBlogFrame.logger.log('DEBUG', 'ContentScrollbar begin.');
                 });
-                // scroll bar hightlight.
                 contentScroll.hoverIntent(() => {
                     contentScroll.addClass('scrollbar-hover');
                 }, () => {
-                    // delay doesn't work!!!
-                    // contentScroll.delay(1250).removeClass('scrollbar-hover');
                     contentScroll.removeClass('scrollbar-hover');
+                });
+            })();
+            (function globalDocument() {
+                frame.on('focus', () => {
+                    console.log('eee');
+                    topbar.removeClass('onTopbarBlur');
+                    topbarMenu.removeClass('onTopbarBlur');
+                });
+                frame.on('blur', () => {
+                    topbar.addClass('onTopbarBlur');
+                    topbarMenu.addClass('onTopbarBlur');
                 });
             })();
         }
@@ -343,14 +314,12 @@ var orzBlogFrame;
     ;
 })(orzBlogFrame || (orzBlogFrame = {}));
 ;
-/// <reference path="./orzProcessor.ts" />
 {
     $(() => {
         var orzProcessor = new orzBlogFrame.orzProcessor();
         orzProcessor.init({
             'defaultTheme': 'light'
         });
-        // orzBlogFrame.logger.log('INFO', 'is could be log?');
     });
 }
 ;

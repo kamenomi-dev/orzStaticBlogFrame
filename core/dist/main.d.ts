@@ -1,10 +1,10 @@
 declare namespace orzBlogFrame.Utils {
     class File {
         constructor();
-        /**
-         * isExistFile
-         */
-        isExistFile(UrlPath: string): boolean;
+        get(urlPath: string): Promise<{
+            data: any;
+            isExist: boolean;
+        }>;
     }
 }
 declare namespace orzBlogFrame.Utils {
@@ -30,13 +30,13 @@ declare namespace orzBlogFrame.Utils {
 }
 declare namespace orzBlogFrame.Utils {
     class LanguageEx {
-        private nodesEle;
+        private nodes;
         private languageIndex;
         private langJson;
         private subLangJson;
         constructor();
-        getSupoortLang(isHotReload?: boolean): Promise<string[]>;
-        set(locale?: string, subLocale?: string): Promise<boolean>;
+        getSupoortLang(reload?: boolean): Promise<string[]>;
+        set(reload?: boolean, locale?: string, subLocale?: string): Promise<boolean>;
         refresh(id?: string): Promise<void>;
         protected getLangJson(arg: string): Promise<any>;
     }

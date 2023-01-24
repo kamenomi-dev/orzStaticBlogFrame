@@ -6,16 +6,15 @@ namespace orzBlogFrame.Utils {
     /**
      * isExistFile
      */
-    public isExistFile(UrlPath: string): boolean {
-      let isExist: boolean = false;
-      $.ajax({
-        url: UrlPath,
-        async: false,
-        success: () => {
-          isExist = true;
-        }
-      });
-      return isExist;
+    public async get(urlPath: string): Promise<{ data: any; isExist: boolean; }> {
+      var result = { data: '', isExist: false };
+      await fetch(urlPath)
+        .then(response => {
+          result.isExist = response.ok;
+          return response.text();
+        })
+        .then(text => result.data = text);
+      return result;
     }
   };
 };

@@ -2,7 +2,7 @@
 
 namespace orzBlogFrame.Utils {
   export class LanguageEx {
-    private nodesEle = $('.orzLanguage');
+    private nodes = $('.orzLanguage');
     private languageIndex: string[] = [];
     private langJson: any;
     private subLangJson: any;
@@ -12,26 +12,15 @@ namespace orzBlogFrame.Utils {
       logger.log('DEBUG', 'orzBlogFrame.Utils@LanguageEx Init!');
     };
 
-    public async getSupoortLang(isHotReload: boolean = false): Promise<string[]> {
-      if (this.languageIndex.length == 0 || isHotReload)
-        $.ajax({
-          url: '/language/langIndex.json',
-          async: false,
-          dataType: 'JSON',
-          success: (response: object) => {
-            for (let locale in response) {
-              this.languageIndex.push(locale);
-            };
-          },
-          error: () => {
-            logger.log('ERROR', 'LangIndex is gone!');
-          }
-        });
+    public async getSupoortLang(reload: boolean = false): Promise<string[]> {
+      if (this.languageIndex.length == 0 || reload)
+        await fetch('/language/langIndex.json')
+          .then(langFile => langFile.json())
+          .then(lang => this.languageIndex = lang);
       return this.languageIndex;
     };
 
-    public async set(locale: string = 'zh-CN', subLocale: string = 'en-US') {
-      /* isExist */
+    public async set(reload: boolean = false, locale: string = 'zh-CN', subLocale: string = 'en-US') {
       if (this.languageIndex.indexOf(locale) == -1) {
         logger.log('WARN', `${locale} is not supported!`);
         return false;
@@ -42,34 +31,41 @@ namespace orzBlogFrame.Utils {
       };
 
       /* Get *.lang.json */
-      if (!this.langJson || this.langJson['language'] != locale)
-        this.langJson = await this.getLangJson(locale);
-      if (!this.subLangJson || this.subLangJson['language'] != subLocale)
-        this.subLangJson = await this.getLangJson(subLocale);
-        // console.log( this.langJson, this.subLangJson);
+      if (locale == subLocale) {
+        this.subLangJson
+          = this.langJson['language'] == locale
+          ? this.langJson
+          : (this.langJson = await this.getLangJson(locale));
+      }else{
+        if (reload || this.langJson['language'] != locale)
+          this.langJson = await this.getLangJson(locale);
+        if (reload || this.subLangJson['language'] != subLocale)
+          this.subLangJson = await this.getLangJson(subLocale);
+      };
 
       /* Set element */
-      this.nodesEle = $('.orzLanguage');
       $('html').attr('lang', locale);
+      this.nodes = $('.orzLanguage');
       this.refresh();
       logger.log('DEBUG', 'Succeefully change language.');
       return true;
     };
 
     public async refresh(id?: string) {
-      const lang = this.langJson['language'];
-      this.nodesEle.each((index, node) => {
-        let node_ = $(node);
-        let value: string;
-        if (node_.attr('by') == id && id) value = id;
-        else value = node_.attr('by') as string;
+      var lang = this.langJson['language'];
+      this.nodes.each((index, node) => {
+        var node_ = $(node);
+        var value: string
+          = (node_.attr('by') == id && id)
+          ? id : node_.attr('by') as string;
 
-        let attrFrom = node_.attr('from');
-        if ((value in this.langJson[lang]) || (value in this.subLangJson[lang]))
+        var attrFrom = node_.attr('from');
+        var text = (this.langJson[lang][value] || this.subLangJson[lang][value]).toString()
+        if (value in (this.langJson[lang] || value in this.subLangJson[lang]))
           node_.text(
             attrFrom
-            ? attrFrom.replace('$1', (this.langJson[lang][value] || this.subLangJson[lang][value]).toString())
-            : (this.langJson[lang][value] || this.subLangJson[lang][value]).toString()
+              ? attrFrom.replace('$1', text)
+              : text
           );
         else
           logger.log('WARN', `${value} isn't in ${lang} langFile. huh?`)
@@ -77,18 +73,13 @@ namespace orzBlogFrame.Utils {
     };
 
     protected async getLangJson(arg: string): Promise<any> {
-      let result;
-      $.ajax({
-        url: `/language/${arg}.lang.json`,
-        async: false,
-        dataType: 'JSON',
-        success: response => {
-          result = response;
-        },
-        error: () => {
-          logger.log('ERROR', 'LangIndex is not consistent!');
-        }
-      });
+      var result;
+      await fetch(`/language/${arg}.lang.json`)
+        .then(response => response.json())
+        .then(json => result = json)
+        .catch((er) => 
+          logger.log('ERROR', `LangIndex isn't consistent! here: ${arg} - ${er.message}`)
+        );
       return result;
     };
   };

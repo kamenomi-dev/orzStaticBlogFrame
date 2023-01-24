@@ -39,6 +39,13 @@ body {
 
 ;
 
+.onTopbarBlur {
+  color: var(--orzframe-fontcolor-onBlur-TopbarMenu);
+  background-color: var(--orzframe-background-onBlur-topbar);
+}
+
+;
+
 /* class */
 .onTop {
   position: fixed;
@@ -73,6 +80,7 @@ body {
     ;
 
     &#orzTopbarMenu {
+      color: var(--orzframe-fontcolor-onBlur-TopbarMenu);
       display: flex;
       flex-direction: row;
       position: absolute;
@@ -81,7 +89,7 @@ body {
       min-width: 36px;
 
       >.orzMenuItem {
-
+        color: inherit;
         align-items: center;
         display: flex;
         height: 30px;
@@ -90,11 +98,22 @@ body {
 
         flex-wrap: nowrap;
 
-        :first-child {
+        &:hover {
+          .orzItemTitle {
+            color: var(--orzframe-fontcolor-onFocus-TopbarMenu);
+            background-color: var(--orzframe-background-onFocus-TopbarMenuItem);
+          }
+
+          ;
+        }
+
+        ;
+
+        >.orzItemTitle {
           display: inline-block;
-          padding: 0 8px;
+          padding: 0 10px;
           font-size: 13px;
-          line-height: 30px;
+          line-height: 22px;
           border-radius: 5px;
           vertical-align: middle;
         }
