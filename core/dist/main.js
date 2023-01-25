@@ -238,6 +238,7 @@ var orzBlogFrame;
         ;
         async init(config) {
             const frame = $('#orzFrame');
+            const global = $(window);
             const topbar = $('#orzTopbarRect', frame);
             const topbarMenu = $('#orzTopbarMenu', topbar);
             const contentRect = $('#orzContentRect', frame);
@@ -246,11 +247,11 @@ var orzBlogFrame;
             const articleContent = $('#orzArticleContent', contentRect);
             (function initCookie() {
                 if ($.cookie('orzContentScrollLeft') == undefined)
-                    $.cookie('orzContentScrollLeft', 170);
+                    $.cookie('orzContentScrollLeft', 218);
                 if ($.cookie('orzCurrentTheme') == undefined)
                     $.cookie('orzCurrentTheme', 'light');
             })();
-            await (async function parseConfig() {
+            (async function parseConfig() {
                 const linkTheme = $('link[id="orzTheme"]');
                 if (config.defaultTheme) {
                     if (!await orzBlogFrame.file.get(`/themes/${config.defaultTheme}/theme.css`))
@@ -261,11 +262,29 @@ var orzBlogFrame;
                     }
                     ;
                 }
-                else {
-                    if ($.cookie('orzCurrentTheme') != 'light')
-                        linkTheme.attr('href', `/themes/${$.cookie('orzCurrentTheme')}/theme.css`);
-                }
-                ;
+                else if ($.cookie('orzCurrentTheme') != 'light')
+                    linkTheme.attr('href', `/themes/${$.cookie('orzCurrentTheme')}/theme.css`);
+            })();
+            (function topbarMenuEvent() {
+                var kids = topbarMenu.children();
+                kids.on('click.topbarMenuItem', (ev) => {
+                    const itemTarget = $(ev.target).attr('by');
+                    switch (itemTarget) {
+                        case 'home':
+                            orzBlogFrame.logger.log('DEBUG', `You Clicked Topbar menu item -> HOME`);
+                            break;
+                        case 'archive':
+                            orzBlogFrame.logger.log('DEBUG', `You Clicked Topbar menu item -> ARCHIVE`);
+                            break;
+                        case 'tags':
+                            orzBlogFrame.logger.log('DEBUG', `You Clicked Topbar menu item -> TAGS`);
+                            break;
+                        case 'links':
+                            orzBlogFrame.logger.log('DEBUG', `You Clicked Topbar menu item -> LINKS`);
+                            break;
+                    }
+                    ;
+                });
             })();
             (function contentScrollbar() {
                 const cookieScrollLeft = $.cookie('orzContentScrollLeft');
@@ -275,37 +294,32 @@ var orzBlogFrame;
                 contentScroll.on('mousedown', ev => {
                     const body = $('body');
                     body.on('mousemove.contentScrollbar', function (ev) {
-                        let step = ev.clientX;
+                        var step = ev.clientX;
                         if (85 + 48 < step && step <= 170 + 48)
                             step = 170 + 48;
                         if (step <= 85 + 48)
                             step = 48;
                         activityRect.width(step);
                         contentScroll.css('left', step - 2);
-                        articleContent.css('left', step - 2);
+                        articleContent.css('left', step);
                     });
                     body.on('mouseup.contentScrollbar', function (ev) {
-                        $.cookie('orzContentScrollLeft', ev.clientX - 2);
+                        $.cookie('orzContentScrollLeft', activityRect.width() - 2);
                         body.off('mouseup.contentScrollbar');
                         body.off('mousemove.contentScrollbar');
                     });
                 });
                 contentScroll.hoverIntent(() => {
-                    contentScroll.addClass('scrollbar-hover');
-                }, () => {
-                    contentScroll.removeClass('scrollbar-hover');
+                    contentScroll.toggleClass('scrollbar-hover');
                 });
             })();
             (function globalDocument() {
-                frame.on('focus', () => {
-                    console.log('eee');
-                    topbar.removeClass('onTopbarBlur');
-                    topbarMenu.removeClass('onTopbarBlur');
-                });
-                frame.on('blur', () => {
-                    topbar.addClass('onTopbarBlur');
-                    topbarMenu.addClass('onTopbarBlur');
-                });
+                function focusToggle() {
+                    topbar.toggleClass('onTopbarBlur');
+                    topbarMenu.toggleClass('onTopbarBlur');
+                }
+                ;
+                global.on('focus', focusToggle).on('blur', focusToggle);
             })();
         }
         ;

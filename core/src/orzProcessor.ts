@@ -23,6 +23,7 @@ namespace orzBlogFrame {
       defaultTheme?: string
     }) {
       const frame = $('#orzFrame');
+      const global = $(window);
       const topbar = $('#orzTopbarRect', frame);
       const topbarMenu = $('#orzTopbarMenu', topbar);
       const contentRect = $('#orzContentRect', frame);
@@ -33,28 +34,47 @@ namespace orzBlogFrame {
       // init something
       (function initCookie() {
         if ($.cookie('orzContentScrollLeft') == undefined)
-          $.cookie('orzContentScrollLeft', 170);
+          $.cookie('orzContentScrollLeft', 218); // 170 + 48
         if ($.cookie('orzCurrentTheme') == undefined)
           $.cookie('orzCurrentTheme', 'light');
       })();
 
       // config parse
-      await (async function parseConfig() {
+      (async function parseConfig() {
         const linkTheme = $('link[id="orzTheme"]');
 
         if (config.defaultTheme) {
           if (!await file.get(`/themes/${config.defaultTheme}/theme.css`))
             logger.log('ERROR', '[orzProcessor@parseConfig] defaultTheme isn\'t exist!\n');
           else {
-            // use default
             $.cookie('orzCurrentTheme', config.defaultTheme);
             linkTheme.attr('href', `/themes/${config.defaultTheme}/theme.css`);
           };
-        } else {
-          // use last theme from cookie
+        } else
           if ($.cookie('orzCurrentTheme') != 'light')
             linkTheme.attr('href', `/themes/${$.cookie('orzCurrentTheme')}/theme.css`);
-        };
+      })();
+
+      // topbar Menu
+      (function topbarMenuEvent() {
+        var kids = topbarMenu.children() as JQuery<HTMLElement, HTMLElement>;
+        kids.on('click.topbarMenuItem', (ev) => {
+          const itemTarget = $(ev.target).attr('by');
+          switch (itemTarget) {
+            case 'home':
+              logger.log('DEBUG', `You Clicked Topbar menu item -> HOME`);
+              break;
+            case 'archive':
+              logger.log('DEBUG', `You Clicked Topbar menu item -> ARCHIVE`);
+              break;
+            case 'tags':
+              logger.log('DEBUG', `You Clicked Topbar menu item -> TAGS`);
+              break;
+            case 'links':
+              logger.log('DEBUG', `You Clicked Topbar menu item -> LINKS`);
+              break;
+          };
+        });
       })();
 
       // content scroll
@@ -70,46 +90,34 @@ namespace orzBlogFrame {
           const body = $('body');
 
           body.on('mousemove.contentScrollbar', function (ev: JQuery.Event) {
-            let step = (ev as unknown as MouseEvent).clientX;
+            var step = (ev as unknown as MouseEvent).clientX;
             if (85 + 48 < step && step <= 170 + 48) step = 170 + 48;
             if (step <= 85 + 48) step = 48;
 
             activityRect.width(step);
             contentScroll.css('left', step - 2);
-            articleContent.css('left', step - 2);
+            articleContent.css('left', step);
           });
 
           body.on('mouseup.contentScrollbar', function (ev: JQuery.Event) {
-            $.cookie('orzContentScrollLeft', ev.clientX! - 2);
+            $.cookie('orzContentScrollLeft', activityRect.width() as number - 2);
             body.off('mouseup.contentScrollbar');
             body.off('mousemove.contentScrollbar');
           });
         });
 
-        // scroll bar hightlight.
-        contentScroll.hoverIntent(
-          () => {
-            contentScroll.addClass('scrollbar-hover');
-          },() => {
-            // delay doesn't work!!!
-            // contentScroll.delay(1250).removeClass('scrollbar-hover');
-            contentScroll.removeClass('scrollbar-hover');
-          }
-        );
+        contentScroll.hoverIntent(() => {
+          contentScroll.toggleClass('scrollbar-hover');
+        });
       })();
 
       // global document
-      (function globalDocument () {
-        frame.on('focus', () => {
-          console.log('eee');
-          
-          topbar.removeClass('onTopbarBlur');
-          topbarMenu.removeClass('onTopbarBlur');
-        });
-        frame.on('blur', () => {
-          topbar.addClass('onTopbarBlur');
-          topbarMenu.addClass('onTopbarBlur');
-        });
+      (function globalDocument() {
+        function focusToggle() {
+          topbar.toggleClass('onTopbarBlur');
+          topbarMenu.toggleClass('onTopbarBlur');
+        };
+        global.on('focus', focusToggle).on('blur', focusToggle);
       })();
     };
   };

@@ -58,13 +58,21 @@ body {
 #orzTopbarRect {
   top: 0px;
   height: 30px;
-  background-color: var(--orzframe-background-onFocus-topbar);
+
+  &:not(&.onTopbarBlur) {
+    color: var(--orzframe-fontcolor-onFocus-TopbarMenu);
+    background-color: var(--orzframe-background-onFocus-topbar);
+  }
+
+  ;
 
   .orzTopbar {
+    color: inherit;
     top: inherit;
     height: inherit;
 
     &#orzTopbarIcon {
+      color: inherit;
       display: block;
       position: relative;
       width: 48px;
@@ -80,22 +88,22 @@ body {
     ;
 
     &#orzTopbarMenu {
-      color: var(--orzframe-fontcolor-onBlur-TopbarMenu);
-      display: flex;
-      flex-direction: row;
       position: absolute;
       top: 0px;
       left: 48px;
       min-width: 36px;
+      display: flex;
+      flex-direction: row;
 
       >.orzMenuItem {
-        color: inherit;
-        align-items: center;
-        display: flex;
+        // color: inherit;
         height: 30px;
         box-sizing: border-box;
+
+        align-items: center;
         white-space: nowrap;
 
+        display: flex;
         flex-wrap: nowrap;
 
         &:hover {
@@ -112,6 +120,7 @@ body {
         >.orzItemTitle {
           display: inline-block;
           padding: 0 10px;
+
           font-size: 13px;
           line-height: 22px;
           border-radius: 5px;
